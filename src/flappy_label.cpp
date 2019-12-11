@@ -20,30 +20,18 @@ FlappyLabel::~FlappyLabel()
 
 void FlappyLabel::hide(std::function<void()> finishCallback, float speed, float delay)
 {
-	auto seq = Shared::ActionHelpers::MakeSequence();
-
-	seq->add(Shared::ActionHelpers::Wait(delay));
-	seq->add(std::make_unique<Common::Actions::Interpolate>(1.0f, 0.0f, Clock::FromSeconds(0.4f / speed), Common::Easing::BackIn, [this](auto value) {
-		setHorizontalAnchor(1.5f - value);
-	}));
-
-	if (finishCallback)
-		seq->add(Shared::ActionHelpers::Execute(finishCallback));
-
-	runAction(std::move(seq));
+	runAction(Shared::ActionHelpers::MakeSequence(
+		Shared::ActionHelpers::Wait(delay),
+		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), 0.5f, 1.5f, 0.4f / speed, Common::Easing::BackIn),
+		Shared::ActionHelpers::Execute(finishCallback)
+	));
 }
 
 void FlappyLabel::show(std::function<void()> finishCallback, float speed, float delay)
 {
-	auto seq = Shared::ActionHelpers::MakeSequence();
-
-	seq->add(Shared::ActionHelpers::Wait(delay));
-	seq->add(std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(0.4f / speed), Common::Easing::BackOut, [this](auto value) {
-		setHorizontalAnchor(1.5f - value);
-	}));
-
-	if (finishCallback)
-		seq->add(Shared::ActionHelpers::Execute(finishCallback));
-
-	runAction(std::move(seq));
+	runAction(Shared::ActionHelpers::MakeSequence(
+		Shared::ActionHelpers::Wait(delay),
+		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), 1.5f, 0.5f, 0.4f / speed, Common::Easing::BackOut),
+		Shared::ActionHelpers::Execute(finishCallback)
+	));
 }

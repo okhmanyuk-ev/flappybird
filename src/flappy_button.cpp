@@ -66,35 +66,19 @@ FlappyButton::~FlappyButton()
 void FlappyButton::hide(std::function<void()> finishCallback)
 {
 	setClickEnabled(false);
-
-	auto seq = Shared::ActionHelpers::MakeSequence();
-
-	seq->add(Shared::ActionHelpers::Wait(0.1f * mOrder));
-	seq->add(std::make_unique<Common::Actions::Interpolate>(1.0f, 0.0f, Clock::FromSeconds(0.4f), Common::Easing::BackIn, [this](auto value) {
-		setHorizontalAnchor(value - 0.5f);
-	}));
-
-	if (finishCallback)
-		seq->add(Shared::ActionHelpers::Execute(finishCallback));
-
-	runAction(std::move(seq));
+	runAction(Shared::ActionHelpers::MakeSequence(
+		Shared::ActionHelpers::Wait(0.1f * mOrder),
+		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), 0.5f, -0.5f, 0.4f, Common::Easing::BackIn),
+		Shared::ActionHelpers::Execute(finishCallback)
+	));
 }
 
 void FlappyButton::show(std::function<void()> finishCallback)
 {
-	auto seq = Shared::ActionHelpers::MakeSequence();
-	
-	seq->add(Shared::ActionHelpers::Wait(0.1f * mOrder));
-	seq->add(std::make_unique<Common::Actions::Interpolate>(0.0f, 1.0f, Clock::FromSeconds(0.4f), Common::Easing::BackOut, [this](auto value) {
-		setHorizontalAnchor(value - 0.5f);
-	}));
-
-	seq->add(Shared::ActionHelpers::Execute([this] {
-		setClickEnabled(true);
-	}));
-
-	if (finishCallback)
-		seq->add(Shared::ActionHelpers::Execute(finishCallback));
-
-	runAction(std::move(seq));
+	setClickEnabled(true);
+	runAction(Shared::ActionHelpers::MakeSequence(
+		Shared::ActionHelpers::Wait(0.1f * mOrder),
+		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), -0.5f, 0.5f, 0.4f, Common::Easing::BackOut),
+		Shared::ActionHelpers::Execute(finishCallback)
+	));
 }
