@@ -60,8 +60,7 @@ void Application::initialize()
 
 	mQuitButton->setClickCallback([this] {
 		hideMainMenu([this] {
-			Common::Actions::Run(Shared::ActionHelpers::MakeSequence(
-				Shared::ActionHelpers::Wait(0.5f),
+			Common::Actions::Run(Shared::ActionHelpers::Delayed(0.5f,
 				Shared::ActionHelpers::Execute([this] {
 					PLATFORM->quit();
 				})
