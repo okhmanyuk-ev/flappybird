@@ -1,4 +1,4 @@
-package com.skymunge.hcg004;
+package com.skymunge.flappybird;
 
 import android.app.NativeActivity;
 import android.os.Bundle;

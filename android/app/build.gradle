@@ -5,7 +5,7 @@ android {
     buildToolsVersion '29.0.0'
 
     defaultConfig {
-        applicationId = 'com.skymunge.hcg004'
+        applicationId = 'com.skymunge.flappybird'
         minSdkVersion 22
         externalNativeBuild {
             cmake {
