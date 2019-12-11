@@ -5,8 +5,6 @@ using namespace FlappyBird;
 
 Application::Application() : RichApplication(PROJECT_CODE)
 {
-	CONSOLE->execute("hud_show_fps 3");
-	CONSOLE->execute("hud_show_dps 1");
 	PLATFORM->setTitle(PROJECT_NAME);
 	PLATFORM->resize(360, 640);
 
@@ -23,6 +21,9 @@ Application::Application() : RichApplication(PROJECT_CODE)
 			PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
 		} }
 	});
+
+	CONSOLE->execute("hud_show_fps 1");
+	RENDERER->setVsync(true);
 }
 
 Application::~Application()
@@ -31,7 +32,7 @@ Application::~Application()
 }
 
 void Application::initialize()
-{
+{	
 	// labels
 	mFlappyBirdLabel = std::make_shared<FlappyLabel>("Flappy Bird");
 	mReadyLabel = std::make_shared<FlappyLabel>("Ready!?");
