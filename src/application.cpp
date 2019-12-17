@@ -9,15 +9,15 @@ Application::Application() : RichApplication(PROJECT_CODE)
 	PLATFORM->resize(360, 640);
 
 	addLoadingTasks({
-		{ "Textures", [this] {
+		{ "textures", [this] {
 			mAtlas = Shared::GraphicsHelpers::OpenAtlasFromFile("textures/all");
 			auto& image = mAtlas->getImage();
 			mAtlasTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
 		} },
-		{ "Fonts", [this] {
+		{ "fonts", [this] {
 			PRECACHE_FONT_ALIAS("fonts/04b19.ttf", "label");
 		} },
-		{ "Fonts", [this] {
+		{ "fonts", [this] {
 			PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
 		} }
 	});
