@@ -107,20 +107,20 @@ void Application::initialize()
 	mGlassesSprite->setSize(GlassesSize);
 	mGlassesSprite->setPivot({ 0.5f, 0.5f });
 
-	mReadyLabel->setColor(Graphics::Color::toNormalized(252, 185, 0));
+	mReadyLabel->setColor(Graphics::Color::ToNormalized(252, 185, 0));
 
 	mScoreLabel->setVerticalAnchor(0.15f);
 
 	mGameOverLabel->setVerticalAnchor(0.2f);
-	mGameOverLabel->setColor(Graphics::Color::toNormalized(230, 68, 52));
+	mGameOverLabel->setColor(Graphics::Color::ToNormalized(230, 68, 52));
 
 	mGameOverScoreLabel->setVerticalAnchor(0.325f);
-	mGameOverScoreLabel->setColor(Graphics::Color::toNormalized(253, 232, 0));
+	mGameOverScoreLabel->setColor(Graphics::Color::ToNormalized(253, 232, 0));
 
 	auto root = mScene.getRoot();
 
 	auto skyRectangle = std::make_shared<Scene::Rectangle>();
-	skyRectangle->setColor(Graphics::Color::toNormalized(83, 190, 206));
+	skyRectangle->setColor(Graphics::Color::ToNormalized(83, 190, 206));
 	skyRectangle->setStretch({ 1.0f, 1.0f });
 	root->attach(skyRectangle);
 

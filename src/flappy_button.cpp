@@ -24,13 +24,13 @@ FlappyButton::FlappyButton(const std::string& text, int order) : mOrder(order)
 	mOrangeRectangle->setAnchor({ 0.5f, 0.5f });
 	mOrangeRectangle->setPivot({ 0.5f, 0.5f });
 	mOrangeRectangle->setSize(size - glm::vec2(8.0f));
-	mOrangeRectangle->setColor(Graphics::Color::toNormalized(231, 97, 0));
+	mOrangeRectangle->setColor(Graphics::Color::ToNormalized(231, 97, 0));
 	mOrangeRectangle->setEnabled(true);
 
 	mGreenRectangle->setAnchor({ 0.5f, 0.5f });
 	mGreenRectangle->setPivot({ 0.5f, 0.5f });
 	mGreenRectangle->setSize(size - glm::vec2(8.0f));
-	mGreenRectangle->setColor(Graphics::Color::toNormalized(97, 231, 0));
+	mGreenRectangle->setColor(Graphics::Color::ToNormalized(97, 231, 0));
 	mGreenRectangle->setEnabled(false);
 	
 	mLabel->setFont(FONT("button"));
