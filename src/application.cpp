@@ -119,29 +119,34 @@ void Application::initialize()
 
 	auto root = mScene.getRoot();
 
-	auto skyRectangle = std::make_shared<Scene::Rectangle>();
-	skyRectangle->setColor(Graphics::Color::ToNormalized(83, 190, 206));
-	skyRectangle->setStretch({ 1.0f, 1.0f });
-	root->attach(skyRectangle);
+	auto bloom_layer = std::make_shared<Scene::BloomLayer>();
+	bloom_layer->setStretch(1.0f);
+	bloom_layer->setPostprocessEnabled(false);
+	root->attach(bloom_layer);
 
-	root->attach(mBackgroundHolder);
-	root->attach(mPipeHolder);
-	root->attach(mGroundHolder);
-	root->attach(mBirdSprite);
-	root->attach(mGlassesSprite);
+	auto sky = std::make_shared<Scene::Rectangle>();
+	sky->setColor(Graphics::Color::ToNormalized(83, 190, 206));
+	sky->setStretch(1.0f);
+	bloom_layer->attach(sky);
 
-	root->attach(mFlappyBirdLabel);
-	root->attach(mReadyLabel);
-	root->attach(mScoreLabel);
-	root->attach(mGameOverLabel);
-	root->attach(mGameOverScoreLabel);
+	sky->attach(mBackgroundHolder);
+	sky->attach(mPipeHolder);
+	sky->attach(mGroundHolder);
+	sky->attach(mBirdSprite);
+	sky->attach(mGlassesSprite);
 
-	root->attach(mPlayButton);
-	root->attach(mHighScoresButton);
-	root->attach(mQuitButton);
+	sky->attach(mFlappyBirdLabel);
+	sky->attach(mReadyLabel);
+	sky->attach(mScoreLabel);
+	sky->attach(mGameOverLabel);
+	sky->attach(mGameOverScoreLabel);
 
-	root->attach(mRetryButton);
-	root->attach(mMainMenuButton);
+	sky->attach(mPlayButton);
+	sky->attach(mHighScoresButton);
+	sky->attach(mQuitButton);
+
+	sky->attach(mRetryButton);
+	sky->attach(mMainMenuButton);
 
 #if defined(BUILD_SPY)
 	auto black_rect = std::make_shared<Scene::Rectangle>();
