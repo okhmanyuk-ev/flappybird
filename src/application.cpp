@@ -121,7 +121,8 @@ void Application::initialize()
 
 	auto bloom_layer = std::make_shared<Scene::BloomLayer>();
 	bloom_layer->setStretch(1.0f);
-	bloom_layer->setPostprocessEnabled(false);
+	bloom_layer->setBrightThreshold(0.96f);
+	bloom_layer->setGlowIntensity(1.125f);
 	root->attach(bloom_layer);
 
 	auto sky = std::make_shared<Scene::Rectangle>();
