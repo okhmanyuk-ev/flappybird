@@ -71,4 +71,6 @@ endif()
 
 # sky
 
-include(sky/CMakeLists.txt)
+add_subdirectory(sky)
+target_link_libraries(${PROJECT_NAME} sky)
+copy_required_libs(${PROJECT_NAME})

@@ -10,7 +10,7 @@ Application::Application() : RichApplication(PROJECT_CODE)
 
 	addLoadingTasks({
 		{ "textures", [this] {
-			mAtlas = Shared::GraphicsHelpers::OpenAtlasFromFile("textures/all");
+			mAtlas = Shared::GraphicsHelpers::OpenAtlasFromFile("textures/all.png", "textures/all_atlas.json");
 			auto& image = mAtlas->getImage();
 			mAtlasTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
 		} },
