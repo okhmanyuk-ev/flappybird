@@ -48,11 +48,11 @@ FlappyButton::FlappyButton(const std::string& text, int order) : mOrder(order)
 	attach(mGreenRectangle);
 	attach(mLabel);
 
-	setChooseCallback([this] {
+	setChooseBeginCallback([this] {
 		mGreenRectangle->setEnabled(true);
 		mOrangeRectangle->setEnabled(false);
 	});
-	setCancelChooseCallback([this] {
+	setChooseEndCallback([this] {
 		mGreenRectangle->setEnabled(false);
 		mOrangeRectangle->setEnabled(true);
 	});
