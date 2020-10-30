@@ -2,9 +2,9 @@
 
 #include <Shared/all.h>
 
-#include "flappy_label.h"
-#include "flappy_button.h"
-#include "flappy_pipe.h"
+#include "label.h"
+#include "button.h"
+#include "pipe.h"
 
 namespace FlappyBird
 {
@@ -88,19 +88,19 @@ namespace FlappyBird
 		Common::Interpolator mGlassesInterpolator;
 
 	private: // labels
-		std::shared_ptr<FlappyLabel> mFlappyBirdLabel;
-		std::shared_ptr<FlappyLabel> mReadyLabel;
-		std::shared_ptr<FlappyLabel> mScoreLabel;
-		std::shared_ptr<FlappyLabel> mGameOverLabel;
-		std::shared_ptr<FlappyLabel> mGameOverScoreLabel;
+		std::shared_ptr<Label> mFlappyBirdLabel;
+		std::shared_ptr<Label> mReadyLabel;
+		std::shared_ptr<Label> mScoreLabel;
+		std::shared_ptr<Label> mGameOverLabel;
+		std::shared_ptr<Label> mGameOverScoreLabel;
 
 	private: // buttons
-		std::shared_ptr<FlappyButton> mPlayButton;
-		std::shared_ptr<FlappyButton> mHighScoresButton;
-		std::shared_ptr<FlappyButton> mQuitButton;
+		std::shared_ptr<Button> mPlayButton;
+		std::shared_ptr<Button> mHighScoresButton;
+		std::shared_ptr<Button> mQuitButton;
 
-		std::shared_ptr<FlappyButton> mRetryButton;
-		std::shared_ptr<FlappyButton> mMainMenuButton;
+		std::shared_ptr<Button> mRetryButton;
+		std::shared_ptr<Button> mMainMenuButton;
 
 	private: // scene
 		std::shared_ptr<Scene::Node> mBackgroundHolder = std::make_shared<Scene::Node>();

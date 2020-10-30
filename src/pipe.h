@@ -4,14 +4,14 @@
 
 namespace FlappyBird
 {
-	class FlappyPipe : public Scene::Node
+	class Pipe : public Scene::Node
 	{
 	public:
 		const static float WindowSize;
 
 	public:
-		FlappyPipe();
-		~FlappyPipe();
+		Pipe();
+		~Pipe();
 
 	public:
 		auto isScored() const { return mScored; }

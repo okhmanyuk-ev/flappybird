@@ -1,8 +1,8 @@
-#include "flappy_button.h"
+#include "button.h"
 
 using namespace FlappyBird;
 
-FlappyButton::FlappyButton(const std::string& text, int order) : mOrder(order)
+Button::Button(const std::string& text, int order) : mOrder(order)
 {
 	const glm::vec2 size = { 150.0f, 35.0f };
 
@@ -58,12 +58,12 @@ FlappyButton::FlappyButton(const std::string& text, int order) : mOrder(order)
 	});
 }
 
-FlappyButton::~FlappyButton()
+Button::~Button()
 {
 	//
 }
 
-void FlappyButton::hide(std::function<void()> finishCallback)
+void Button::hide(std::function<void()> finishCallback)
 {
 	setClickEnabled(false);
 	runAction(Shared::ActionHelpers::MakeSequence(
@@ -73,7 +73,7 @@ void FlappyButton::hide(std::function<void()> finishCallback)
 	));
 }
 
-void FlappyButton::show(std::function<void()> finishCallback)
+void Button::show(std::function<void()> finishCallback)
 {
 	setClickEnabled(true);
 	runAction(Shared::ActionHelpers::MakeSequence(

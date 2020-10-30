@@ -4,14 +4,14 @@
 
 namespace FlappyBird
 {
-	class FlappyButton : public Scene::Actionable<Scene::Clickable<Scene::Node>>, public std::enable_shared_from_this<FlappyButton>
+	class Button : public Scene::Actionable<Scene::Clickable<Scene::Node>>, public std::enable_shared_from_this<Button>
 	{
 	public:
 		typedef std::function<void()> ClickCallback;
 
 	public:
-		FlappyButton(const std::string& text, int order);
-		~FlappyButton();
+		Button(const std::string& text, int order);
+		~Button();
 
 	public:
 		void hide(std::function<void()> finishCallback = nullptr);

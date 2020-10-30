@@ -1,11 +1,10 @@
 #include "application.h"
-#include "defines.h"
 
 using namespace FlappyBird;
 
-Application::Application() : Shared::Application(PROJECT_CODE, { Shared::Application::Flag::Scene })
+Application::Application() : Shared::Application(PROJECT_NAME, { Shared::Application::Flag::Scene })
 {
-	PLATFORM->setTitle(PROJECT_CODE);
+	PLATFORM->setTitle(PRODUCT_NAME);
 	PLATFORM->resize(360, 640);
 	RENDERER->setVsync(true);
 #if !defined(PLATFORM_MOBILE)
@@ -40,19 +39,19 @@ Application::~Application()
 void Application::initialize()
 {	
 	// labels
-	mFlappyBirdLabel = std::make_shared<FlappyLabel>("Flappy Bird");
-	mReadyLabel = std::make_shared<FlappyLabel>("Ready!?");
-	mScoreLabel = std::make_shared<FlappyLabel>();
-	mGameOverLabel = std::make_shared<FlappyLabel>("Game Over");
-	mGameOverScoreLabel = std::make_shared<FlappyLabel>();
+	mFlappyBirdLabel = std::make_shared<Label>("Flappy Bird");
+	mReadyLabel = std::make_shared<Label>("Ready!?");
+	mScoreLabel = std::make_shared<Label>();
+	mGameOverLabel = std::make_shared<Label>("Game Over");
+	mGameOverScoreLabel = std::make_shared<Label>();
 
 	// buttons
-	mPlayButton = std::make_shared<FlappyButton>("PLAY", 0);
-	mHighScoresButton = std::make_shared<FlappyButton>("HIGH SCORES", 1);
-	mQuitButton = std::make_shared<FlappyButton>("QUIT", 2);
+	mPlayButton = std::make_shared<Button>("PLAY", 0);
+	mHighScoresButton = std::make_shared<Button>("HIGH SCORES", 1);
+	mQuitButton = std::make_shared<Button>("QUIT", 2);
 
-	mRetryButton = std::make_shared<FlappyButton>("RETRY", 1);
-	mMainMenuButton = std::make_shared<FlappyButton>("MAIN MENY", 2);
+	mRetryButton = std::make_shared<Button>("RETRY", 1);
+	mMainMenuButton = std::make_shared<Button>("MAIN MENY", 2);
 
 	mPlayButton->setClickCallback([this] {
 		hideMainMenu([this] {
@@ -271,11 +270,11 @@ void Application::frame()
 	{
 		if (!mPipeHolder->hasNodes() || PLATFORM->getLogicalWidth() - mPipeHolder->getNodes().back()->getX() >= PipeSpawnDistance)
 		{
-			auto pipe = std::make_shared<FlappyPipe>();
+			auto pipe = std::make_shared<Pipe>();
 
 			float padding = 25.0f * PLATFORM->getScale();
-			float min = 0.0f + (FlappyPipe::WindowSize / 2.0f) + padding;
-			float max = getWorkingAreaHeight() - (FlappyPipe::WindowSize / 2.0f) - padding;
+			float min = 0.0f + (Pipe::WindowSize / 2.0f) + padding;
+			float max = getWorkingAreaHeight() - (Pipe::WindowSize / 2.0f) - padding;
 
 			if (max < min)
 				max = min;
@@ -305,8 +304,8 @@ void Application::frame()
 				continue;
 			}
 
-			if (mBird.vert_position + (BirdSize.y / 2.0f) < pipe->getY() + (FlappyPipe::WindowSize / 2.0f) &&
-				mBird.vert_position - (BirdSize.y / 2.0f) > pipe->getY() - (FlappyPipe::WindowSize / 2.0f))
+			if (mBird.vert_position + (BirdSize.y / 2.0f) < pipe->getY() + (Pipe::WindowSize / 2.0f) &&
+				mBird.vert_position - (BirdSize.y / 2.0f) > pipe->getY() - (Pipe::WindowSize / 2.0f))
 			{
 				continue;
 			}
@@ -322,7 +321,7 @@ void Application::frame()
 	{
 		for (const auto _pipe : mPipeHolder->getNodes())
 		{
-			auto pipe = std::static_pointer_cast<FlappyPipe>(_pipe);
+			auto pipe = std::static_pointer_cast<Pipe>(_pipe);
 			
 			if (pipe->isScored())
 				continue;

@@ -1,8 +1,8 @@
-#include "flappy_label.h"
+#include "label.h"
 
 using namespace FlappyBird;
 
-FlappyLabel::FlappyLabel(const std::string& text)
+Label::Label(const std::string& text)
 {
 	setFont(FONT("label"));
 	setFontSize(50.0f);
@@ -13,12 +13,12 @@ FlappyLabel::FlappyLabel(const std::string& text)
 	setOutlineThickness(0.75f);
 }
 
-FlappyLabel::~FlappyLabel()
+Label::~Label()
 {
 	//
 }
 
-void FlappyLabel::hide(std::function<void()> finishCallback, float speed, float delay)
+void Label::hide(std::function<void()> finishCallback, float speed, float delay)
 {
 	runAction(Shared::ActionHelpers::MakeSequence(
 		Shared::ActionHelpers::Wait(delay),
@@ -27,7 +27,7 @@ void FlappyLabel::hide(std::function<void()> finishCallback, float speed, float 
 	));
 }
 
-void FlappyLabel::show(std::function<void()> finishCallback, float speed, float delay)
+void Label::show(std::function<void()> finishCallback, float speed, float delay)
 {
 	runAction(Shared::ActionHelpers::MakeSequence(
 		Shared::ActionHelpers::Wait(delay),

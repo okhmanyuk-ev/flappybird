@@ -1,10 +1,10 @@
-#include "flappy_pipe.h"
+#include "pipe.h"
 
 using namespace FlappyBird;
 
-const float FlappyPipe::WindowSize = 180.0f;
+const float Pipe::WindowSize = 180.0f;
 
-FlappyPipe::FlappyPipe()
+Pipe::Pipe()
 {
 	const float size = 75.0f;
 
@@ -47,7 +47,7 @@ FlappyPipe::FlappyPipe()
 	attach(bottomBody);
 }
 
-FlappyPipe::~FlappyPipe()
+Pipe::~Pipe()
 {
 	//
 }

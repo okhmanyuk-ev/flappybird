@@ -1,24 +1,37 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(flappybird)
 
+set(PRODUCT_NAME "Flappy Bird")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # main
 
-add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+if(BUILD_DEVELOPER)
+	add_definitions(-DBUILD_DEVELOPER)
+endif()
+
+add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
+add_definitions(-DPRODUCT_NAME="${PRODUCT_NAME}")
+
+file(GLOB MAIN_SRC
+	src/*.cpp
+	src/*.h
+)
+
+source_group("all" FILES ${MAIN_SRC})
+
+file(GLOB ALL_SRC
+	${MAIN_SRC}
+)
 
 if(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
     add_definitions(-DNOMINMAX)
 	
-    file(GLOB MAIN_SRC
-        "src/*.cpp"
-        "src/*.h"
-    )
-
     add_executable(${PROJECT_NAME} 
-        ${MAIN_SRC}
+        ${ALL_SRC}
     )
 
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -44,7 +57,7 @@ if(APPLE)
     )
 
     add_executable(${PROJECT_NAME} 
-        ${MAIN_SRC}
+        ${ALL_SRC}
         ${RESOURCES}
     )
 
