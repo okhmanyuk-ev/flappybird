@@ -1,0 +1,10 @@
+{
+    "all": [
+		"textures/background.png",
+		"textures/bird.png",
+		"textures/glasses.png",
+		"textures/pipe_body.png",
+		"textures/pipe_bottom.png",
+		"textures/pipe_top.png"
+    ]
+}

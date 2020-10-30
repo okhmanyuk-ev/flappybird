@@ -3,27 +3,33 @@
 
 using namespace FlappyBird;
 
-Application::Application() : RichApplication(PROJECT_CODE)
+Application::Application() : Shared::Application(PROJECT_CODE, { Shared::Application::Flag::Scene })
 {
-	PLATFORM->setTitle(PROJECT_NAME);
+	PLATFORM->setTitle(PROJECT_CODE);
 	PLATFORM->resize(360, 640);
-
-	addLoadingTasks({
-		{ "textures", [this] {
-			mAtlas = Shared::GraphicsHelpers::OpenAtlasFromFile("textures/all.png", "textures/all_atlas.json");
-			auto& image = mAtlas->getImage();
-			mAtlasTexture = std::make_shared<Renderer::Texture>(image.getWidth(), image.getHeight(), image.getChannels(), image.getMemory());
-		} },
-		{ "fonts", [this] {
-			PRECACHE_FONT_ALIAS("fonts/04b19.ttf", "label");
-		} },
-		{ "fonts", [this] {
-			PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
-		} }
-	});
-
-	CONSOLE->execute("hud_show_fps 1");
 	RENDERER->setVsync(true);
+#if !defined(PLATFORM_MOBILE)
+	PLATFORM->rescale(1.5f);
+#endif
+
+	PRECACHE_FONT_ALIAS("fonts/04b19.ttf", "label");
+	PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
+
+#if defined(BUILD_DEVELOPER)
+	CONSOLE->execute("hud_show_fps 1");
+	CONSOLE->execute("hud_show_drawcalls 1");
+#else
+	CONSOLE_DEVICE->setEnabled(false);
+	STATS->setEnabled(false);
+#endif
+
+	RENDERER->setVsync(true);
+
+	CACHE->makeAtlases();
+
+	FRAME->addOne([this] {
+		initialize();
+	});
 }
 
 Application::~Application()
@@ -97,13 +103,11 @@ void Application::initialize()
 	mPipeHolder->setStretch({ 1.0f, 1.0f });
 	mGroundHolder->setStretch({ 1.0f, 1.0f });
 
-	mBirdSprite->setTexture(mAtlasTexture);
-	mBirdSprite->setTexRegion(mAtlas->getTexRegions().at("bird"));
+	mBirdSprite->setTexture(TEXTURE("textures/bird.png"));
 	mBirdSprite->setSize(BirdSize);
 	mBirdSprite->setPivot({ 0.5f, 0.5f });
 
-	mGlassesSprite->setTexture(mAtlasTexture);
-	mGlassesSprite->setTexRegion(mAtlas->getTexRegions().at("glasses"));
+	mGlassesSprite->setTexture(TEXTURE("textures/glasses.png"));
 	mGlassesSprite->setSize(GlassesSize);
 	mGlassesSprite->setPivot({ 0.5f, 0.5f });
 
@@ -117,7 +121,7 @@ void Application::initialize()
 	mGameOverScoreLabel->setVerticalAnchor(0.325f);
 	mGameOverScoreLabel->setColor(Graphics::Color::ToNormalized(253, 232, 0));
 
-	auto root = mScene.getRoot();
+	auto root = mScene->getRoot();
 
 	auto bloom_layer = std::make_shared<Scene::BloomLayer>();
 	bloom_layer->setStretch(1.0f);
@@ -159,12 +163,6 @@ void Application::initialize()
 }
 
 void Application::frame()
-{
-	update();
-	mScene.frame();
-}
-
-void Application::update()
 {
 	float dTime = Clock::ToSeconds(FRAME->getTimeDelta());
 
@@ -247,13 +245,13 @@ void Application::update()
 		pipe->setX(pipe->getX()- offset);
 	}
 
-	auto bg_width = static_cast<float>(mAtlas->getTexRegions().at("background").size.x);
+	auto bg_width = static_cast<float>(TEXTURE("textures/background.png").getWidth());
 	while (mWorld.backgroundHorzPosition < -bg_width)
 	{
 		mWorld.backgroundHorzPosition += bg_width;
 	}
 
-	auto g_width = static_cast<float>(mAtlas->getTexRegions().at("ground").size.x);
+	auto g_width = static_cast<float>(TEXTURE("textures/ground.png").getWidth());
 	while (mWorld.groundHorzPosition < -g_width)
 	{
 		mWorld.groundHorzPosition += g_width;
@@ -273,8 +271,7 @@ void Application::update()
 	{
 		if (!mPipeHolder->hasNodes() || PLATFORM->getLogicalWidth() - mPipeHolder->getNodes().back()->getX() >= PipeSpawnDistance)
 		{
-			auto pipe = std::make_shared<FlappyPipe>(mAtlasTexture, mAtlas->getTexRegions().at("pipe_top"),
-				mAtlas->getTexRegions().at("pipe_bottom"), mAtlas->getTexRegions().at("pipe_body"));
+			auto pipe = std::make_shared<FlappyPipe>();
 
 			float padding = 25.0f * PLATFORM->getScale();
 			float min = 0.0f + (FlappyPipe::WindowSize / 2.0f) + padding;
@@ -364,11 +361,10 @@ void Application::update()
 	while (static_cast<int>(bg_nodes.size()) < bg_count)
 	{
 		auto node = std::make_shared<Scene::Sprite>();
-		node->setTexture(mAtlasTexture);
-		node->setTexRegion(mAtlas->getTexRegions().at("background"));
+		node->setTexture(TEXTURE("textures/background.png"));
 		node->setPivot({ 0.0f, 1.0f });
 		node->setAnchor({ 0.0f, 1.0f }); 
-		node->setY(static_cast<float>(-mAtlas->getTexRegions().at("ground").size.y));
+		node->setY(static_cast<float>(-TEXTURE("textures/ground.png").getHeight()));
 		mBackgroundHolder->attach(node);
 	}
 	while (static_cast<int>(bg_nodes.size()) > bg_count)
@@ -392,8 +388,7 @@ void Application::update()
 	while (static_cast<int>(g_nodes.size()) < g_count)
 	{
 		auto node = std::make_shared<Scene::Sprite>();
-		node->setTexture(mAtlasTexture);
-		node->setTexRegion(mAtlas->getTexRegions().at("ground"));
+		node->setTexture(TEXTURE("textures/ground.png"));
 		node->setPivot({ 0.0f, 1.0f });
 		node->setAnchor({ 0.0f, 1.0f });
 		mGroundHolder->attach(node);
@@ -444,25 +439,25 @@ void Application::collide()
 	showGameOverMenu();
 }
 
-void Application::event(const Platform::Keyboard::Event& e)
+void Application::onEvent(const Platform::Input::Keyboard::Event& e)
 {
-	if (e.type != Platform::Keyboard::Event::Type::Pressed)
+	if (e.type != Platform::Input::Keyboard::Event::Type::Pressed)
 		return;
 
 	tap();
 }
 
-void Application::event(const Platform::Mouse::Event& e)
+void Application::onEvent(const Platform::Input::Mouse::Event& e)
 {
-	if (e.type != Platform::Mouse::Event::Type::ButtonDown)
+	if (e.type != Platform::Input::Mouse::Event::Type::ButtonDown)
 		return;
 
 	tap();
 }
 
-void Application::event(const Platform::Touch::Event& e)
+void Application::onEvent(const Platform::Input::Touch::Event& e)
 {
-	if (e.type != Platform::Touch::Event::Type::Begin) 
+	if (e.type != Platform::Input::Touch::Event::Type::Begin)
 		return;
 
 	tap();
@@ -550,7 +545,7 @@ void Application::hidePlayMenu(std::function<void()> finishCallback)
 
 float Application::getWorkingAreaHeight()
 {
-	return PLATFORM->getLogicalHeight() - mAtlas->getTexRegions().at("ground").size.y;
+	return PLATFORM->getLogicalHeight() - TEXTURE("textures/ground.png").getHeight();
 }
 
 float Application::getBirdHorizontalPosition()

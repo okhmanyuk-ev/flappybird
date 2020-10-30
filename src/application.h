@@ -8,27 +8,27 @@
 
 namespace FlappyBird
 {
-	class Application : public Shared::RichApplication, 
-		public Common::EventSystem::Listenable<Platform::Keyboard::Event>,
-		public Common::EventSystem::Listenable<Platform::Mouse::Event>,
-		public Common::EventSystem::Listenable<Platform::Touch::Event>
+	class Application : public Shared::Application, 
+		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
+		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
+		public Common::Event::Listenable<Platform::Input::Touch::Event>,
+		public Common::FrameSystem::Frameable
 	{
 	public:
 		Application();
 		~Application();
 		
 	private:
-		void initialize() override;
+		void initialize();
 		void frame() override;
-		void update();
 		void tap();
 		void jump();
 		void collide();
 		
 	private:
-		void event(const Platform::Keyboard::Event& e) override;
-		void event(const Platform::Mouse::Event& e) override;
-		void event(const Platform::Touch::Event& e) override;
+		void onEvent(const Platform::Input::Keyboard::Event& e) override;
+		void onEvent(const Platform::Input::Mouse::Event& e) override;
+		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
 		void showMainMenu();
@@ -87,20 +87,6 @@ namespace FlappyBird
 
 		Common::Interpolator mGlassesInterpolator;
 
-	public:
-		/*Graphics::Atlas mAtlas = Graphics::Atlas({
-			{ "bird", Platform::Asset("textures/bird.png") },
-			{ "background", Platform::Asset("textures/background.png") },
-			{ "ground", Platform::Asset("textures/ground.png") },
-			{ "pipe_body", Platform::Asset("textures/pipe_body.png") },
-			{ "pipe_bottom", Platform::Asset("textures/pipe_bottom.png") },
-			{ "pipe_top", Platform::Asset("textures/pipe_top.png") },
-			{ "glasses", Platform::Asset("textures/glasses.png") }
-		});*/
-
-		std::optional<Graphics::Atlas> mAtlas;
-		std::shared_ptr<Renderer::Texture> mAtlasTexture;
-
 	private: // labels
 		std::shared_ptr<FlappyLabel> mFlappyBirdLabel;
 		std::shared_ptr<FlappyLabel> mReadyLabel;
@@ -117,8 +103,6 @@ namespace FlappyBird
 		std::shared_ptr<FlappyButton> mMainMenuButton;
 
 	private: // scene
-		Scene::Scene mScene;
-		
 		std::shared_ptr<Scene::Node> mBackgroundHolder = std::make_shared<Scene::Node>();
 		std::shared_ptr<Scene::Node> mPipeHolder = std::make_shared<Scene::Node>();
 		std::shared_ptr<Scene::Node> mGroundHolder = std::make_shared<Scene::Node>();

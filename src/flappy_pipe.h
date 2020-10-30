@@ -10,8 +10,7 @@ namespace FlappyBird
 		const static float WindowSize;
 
 	public:
-		FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& top_region, const Graphics::TexRegion& bottom_region, 
-			const Graphics::TexRegion& body_region);
+		FlappyPipe();
 		~FlappyPipe();
 
 	public:

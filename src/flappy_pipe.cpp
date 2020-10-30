@@ -4,8 +4,7 @@ using namespace FlappyBird;
 
 const float FlappyPipe::WindowSize = 180.0f;
 
-FlappyPipe::FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const Graphics::TexRegion& top_region, const Graphics::TexRegion& bottom_region,
-	const Graphics::TexRegion& body_region)
+FlappyPipe::FlappyPipe()
 {
 	const float size = 75.0f;
 
@@ -14,8 +13,7 @@ FlappyPipe::FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const 
 	setHorizontalPivot(0.5f);
 
 	auto topSprite = std::make_shared<Scene::Sprite>();
-	topSprite->setTexture(texture);
-	topSprite->setTexRegion(top_region);
+	topSprite->setTexture(TEXTURE("textures/pipe_top.png"));
 	topSprite->setAnchor({ 0.5f, 0.0f });
 	topSprite->setPivot({ 0.5f, 0.0f });
 	topSprite->setSize({ size, size });
@@ -23,8 +21,7 @@ FlappyPipe::FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const 
 	attach(topSprite);
 
 	auto topBody = std::make_shared<Scene::Sprite>();
-	topBody->setTexture(texture);
-	topBody->setTexRegion(body_region);
+	topBody->setTexture(TEXTURE("textures/pipe_body.png"));
 	topBody->setAnchor({ 0.5f, 0.0f });
 	topBody->setPivot({ 0.5f, 0.0f });
 	topBody->setVerticalStretch(1.0f);
@@ -33,8 +30,7 @@ FlappyPipe::FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const 
 	attach(topBody);
 	
 	auto bottomSprite = std::make_shared<Scene::Sprite>();
-	bottomSprite->setTexture(texture);
-	bottomSprite->setTexRegion(bottom_region);
+	bottomSprite->setTexture(TEXTURE("textures/pipe_bottom.png"));
 	bottomSprite->setAnchor({ 0.5f, 0.0f });
 	bottomSprite->setPivot({ 0.5f, 1.0f });
 	bottomSprite->setSize({ size, size });
@@ -42,8 +38,7 @@ FlappyPipe::FlappyPipe(const std::shared_ptr<Renderer::Texture>& texture, const 
 	attach(bottomSprite);
 
 	auto bottomBody = std::make_shared<Scene::Sprite>();
-	bottomBody->setTexture(texture);
-	bottomBody->setTexRegion(body_region);
+	bottomBody->setTexture(TEXTURE("textures/pipe_body.png"));
 	bottomBody->setAnchor({ 0.5f, 0.0f });
 	bottomBody->setPivot({ 0.5f, 1.0f });
 	bottomBody->setVerticalStretch(1.0f);
