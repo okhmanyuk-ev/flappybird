@@ -9,9 +9,6 @@
 namespace FlappyBird
 {
 	class Application : public Shared::Application, 
-		public Common::Event::Listenable<Platform::Input::Keyboard::Event>,
-		public Common::Event::Listenable<Platform::Input::Mouse::Event>,
-		public Common::Event::Listenable<Platform::Input::Touch::Event>,
 		public Common::FrameSystem::Frameable
 	{
 	public:
@@ -24,11 +21,6 @@ namespace FlappyBird
 		void tap();
 		void jump();
 		void collide();
-		
-	private:
-		void onEvent(const Platform::Input::Keyboard::Event& e) override;
-		void onEvent(const Platform::Input::Mouse::Event& e) override;
-		void onEvent(const Platform::Input::Touch::Event& e) override;
 
 	private:
 		void showMainMenu();
@@ -58,8 +50,6 @@ namespace FlappyBird
 		struct
 		{
 			float horz_velocity = 0.0f;
-			float backgroundHorzPosition = 0.0f;
-			float groundHorzPosition = 0.0f;
 		} mWorld;
 
 		enum class State
@@ -103,9 +93,9 @@ namespace FlappyBird
 		std::shared_ptr<Button> mMainMenuButton;
 
 	private: // scene
-		std::shared_ptr<Scene::Node> mBackgroundHolder = std::make_shared<Scene::Node>();
+		std::shared_ptr<Scene::Actionable<Scene::Sprite>> mBackground;
 		std::shared_ptr<Scene::Node> mPipeHolder = std::make_shared<Scene::Node>();
-		std::shared_ptr<Scene::Node> mGroundHolder = std::make_shared<Scene::Node>();
+		std::shared_ptr<Scene::Actionable<Scene::Sprite>> mGround;
 		std::shared_ptr<Scene::Sprite> mBirdSprite = std::make_shared<Scene::Sprite>();
 		std::shared_ptr<Scene::Sprite> mGlassesSprite = std::make_shared<Scene::Sprite>();
 	};

@@ -26,9 +26,7 @@ Application::Application() : Shared::Application(PROJECT_NAME, { Shared::Applica
 
 	CACHE->makeAtlases();
 
-	FRAME->addOne([this] {
-		initialize();
-	});
+	initialize();
 }
 
 Application::~Application()
@@ -98,10 +96,8 @@ void Application::initialize()
 	mBird.vert_position = -BirdSize.y;
 	mBird.fall_velocity = MaxFallSpeed;
 
-	mBackgroundHolder->setStretch({ 1.0f, 1.0f });
 	mPipeHolder->setStretch({ 1.0f, 1.0f });
-	mGroundHolder->setStretch({ 1.0f, 1.0f });
-
+	
 	mBirdSprite->setTexture(TEXTURE("textures/bird.png"));
 	mBirdSprite->setSize(BirdSize);
 	mBirdSprite->setPivot({ 0.5f, 0.5f });
@@ -128,14 +124,38 @@ void Application::initialize()
 	bloom_layer->setGlowIntensity(1.125f);
 	root->attach(bloom_layer);
 
-	auto sky = std::make_shared<Scene::Rectangle>();
+	auto sky = std::make_shared<Scene::Tappable<Scene::Rectangle>>();
+	sky->setTapCallback([this] {
+		tap();
+	});
 	sky->setColor(Graphics::Color::ToNormalized(83, 190, 206));
 	sky->setStretch(1.0f);
 	bloom_layer->attach(sky);
 
-	sky->attach(mBackgroundHolder);
+	mBackground = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+	mBackground->setTexture(TEXTURE("textures/background.png"));
+	mBackground->setAnchor({ 0.0f, 1.0f });
+	mBackground->setPivot({ 0.0f, 1.0f });
+	mBackground->setStretch({ 4.0f, -1.0f });
+	mBackground->setTextureAddress(Renderer::TextureAddress::Wrap);
+	mBackground->runAction(Shared::ActionHelpers::ExecuteInfinite([this] {
+		mBackground->setTexRegion({ { 0.0f, 0.0f }, { mBackground->getWidth(), 0.0f } });
+	}));
+	sky->attach(mBackground);
+
 	sky->attach(mPipeHolder);
-	sky->attach(mGroundHolder);
+
+	mGround = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+	mGround->setTexture(TEXTURE("textures/ground.png"));
+	mGround->setAnchor({ 0.0f, 1.0f });
+	mGround->setPivot({ 0.0f, 1.0f });
+	mGround->setStretch({ 2.0f, -1.0f });
+	mGround->setTextureAddress(Renderer::TextureAddress::Wrap);
+	mGround->runAction(Shared::ActionHelpers::ExecuteInfinite([this] {
+		mGround->setTexRegion({ { 0.0f, 0.0f }, { mGround->getWidth(), 0.0f } });
+	}));
+	sky->attach(mGround);
+
 	sky->attach(mBirdSprite);
 	sky->attach(mGlassesSprite);
 
@@ -236,24 +256,26 @@ void Application::frame()
 	if (mState != State::GameOver || mClearing)
 		offset = mWorld.horz_velocity * dTime * 100.0f / 1.5f;
 
-	mWorld.backgroundHorzPosition -= offset / 2.0f;
-	mWorld.groundHorzPosition -= offset;
+	// move background
+
+	mBackground->setY(-mGround->getHeight());
+	mBackground->setX(mBackground->getX() - (offset / 2.0f));
+	if (auto tex_w = mBackground->getTexture()->getWidth(); mBackground->getX() <= -tex_w)
+	{
+		mBackground->setX(mBackground->getX() + tex_w);
+	}
+
+	// move ground
+
+	mGround->setX(mGround->getX() - offset);
+	if (auto tex_w = (float)mGround->getTexture()->getWidth(); mGround->getX() <= -tex_w)
+	{
+		mGround->setX(mGround->getX() + tex_w);
+	}
 
 	for (auto& pipe : mPipeHolder->getNodes())
 	{
 		pipe->setX(pipe->getX()- offset);
-	}
-
-	auto bg_width = static_cast<float>(TEXTURE("textures/background.png").getWidth());
-	while (mWorld.backgroundHorzPosition < -bg_width)
-	{
-		mWorld.backgroundHorzPosition += bg_width;
-	}
-
-	auto g_width = static_cast<float>(TEXTURE("textures/ground.png").getWidth());
-	while (mWorld.groundHorzPosition < -g_width)
-	{
-		mWorld.groundHorzPosition += g_width;
 	}
 
 	while (mPipeHolder->hasNodes())
@@ -350,59 +372,6 @@ void Application::frame()
 	mGlassesSprite->setRotation(mBird.rotation * mGlassesInterpolator.getValue());
 	mGlassesSprite->setX(getBirdHorizontalPosition());
 	mGlassesSprite->setY(glassesDefaultPos + ((-glassesDefaultPos + mBird.vert_position - 5.0f) * mGlassesInterpolator.getValue()));
-
-	// background holder
-
-	//float bg_width = static_cast<float>(mBackgroundTexture.getWidth());
-	auto bg_count = static_cast<int>(std::ceil(PLATFORM->getLogicalWidth() / bg_width)) + 1;
-	assert(bg_count >= 0);
-	auto& bg_nodes = mBackgroundHolder->getNodes();
-	while (static_cast<int>(bg_nodes.size()) < bg_count)
-	{
-		auto node = std::make_shared<Scene::Sprite>();
-		node->setTexture(TEXTURE("textures/background.png"));
-		node->setPivot({ 0.0f, 1.0f });
-		node->setAnchor({ 0.0f, 1.0f }); 
-		node->setY(static_cast<float>(-TEXTURE("textures/ground.png").getHeight()));
-		mBackgroundHolder->attach(node);
-	}
-	while (static_cast<int>(bg_nodes.size()) > bg_count)
-	{
-		auto node = bg_nodes.front();
-		mBackgroundHolder->detach(node);
-	}
-	float bg_offset = 0.0f;
-	for (auto node : bg_nodes)
-	{
-		node->setX(mWorld.backgroundHorzPosition + bg_offset);
-		bg_offset += bg_width;
-	}
-
-	// ground holder
-
-	//float g_width = static_cast<float>(mGroundTexture.getWidth());
-	auto g_count = static_cast<int>(std::ceil(PLATFORM->getLogicalWidth() / g_width)) + 1;
-	assert(g_count >= 0);
-	auto& g_nodes = mGroundHolder->getNodes();
-	while (static_cast<int>(g_nodes.size()) < g_count)
-	{
-		auto node = std::make_shared<Scene::Sprite>();
-		node->setTexture(TEXTURE("textures/ground.png"));
-		node->setPivot({ 0.0f, 1.0f });
-		node->setAnchor({ 0.0f, 1.0f });
-		mGroundHolder->attach(node);
-	}
-	while (static_cast<int>(g_nodes.size()) > g_count)
-	{
-		auto node = g_nodes.front();
-		mGroundHolder->detach(node);
-	}
-	float g_offset = 0.0f;
-	for (auto node : g_nodes)
-	{
-		node->setX(mWorld.groundHorzPosition + g_offset);
-		g_offset += g_width;
-	}
 }
 
 void Application::tap()
@@ -436,30 +405,6 @@ void Application::collide()
 {
 	hidePlayMenu();
 	showGameOverMenu();
-}
-
-void Application::onEvent(const Platform::Input::Keyboard::Event& e)
-{
-	if (e.type != Platform::Input::Keyboard::Event::Type::Pressed)
-		return;
-
-	tap();
-}
-
-void Application::onEvent(const Platform::Input::Mouse::Event& e)
-{
-	if (e.type != Platform::Input::Mouse::Event::Type::ButtonDown)
-		return;
-
-	tap();
-}
-
-void Application::onEvent(const Platform::Input::Touch::Event& e)
-{
-	if (e.type != Platform::Input::Touch::Event::Type::Begin)
-		return;
-
-	tap();
 }
 
 void Application::showMainMenu()
@@ -544,7 +489,7 @@ void Application::hidePlayMenu(std::function<void()> finishCallback)
 
 float Application::getWorkingAreaHeight()
 {
-	return PLATFORM->getLogicalHeight() - TEXTURE("textures/ground.png").getHeight();
+	return PLATFORM->getLogicalHeight() - mGround->getHeight();
 }
 
 float Application::getBirdHorizontalPosition()
