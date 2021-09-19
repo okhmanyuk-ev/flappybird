@@ -4,7 +4,7 @@
 
 namespace FlappyBird
 {
-	class Label : public Scene::Actionable<Scene::Label>, public std::enable_shared_from_this<Label>
+	class Label : public Scene::Label, public std::enable_shared_from_this<Label>
 	{
 	public:
 		Label(const std::string& text = "");

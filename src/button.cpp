@@ -66,19 +66,19 @@ Button::~Button()
 void Button::hide(std::function<void()> finishCallback)
 {
 	setClickEnabled(false);
-	runAction(Shared::ActionHelpers::MakeSequence(
-		Shared::ActionHelpers::Wait(0.1f * mOrder),
-		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), 0.5f, -0.5f, 0.4f, Common::Easing::BackIn),
-		Shared::ActionHelpers::Execute(finishCallback)
+	runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::Wait(0.1f * mOrder),
+		Actions::Collection::ChangeHorizontalAnchor(shared_from_this(), 0.5f, -0.5f, 0.4f, Easing::BackIn),
+		Actions::Collection::Execute(finishCallback)
 	));
 }
 
 void Button::show(std::function<void()> finishCallback)
 {
 	setClickEnabled(true);
-	runAction(Shared::ActionHelpers::MakeSequence(
-		Shared::ActionHelpers::Wait(0.1f * mOrder),
-		Shared::ActionHelpers::ChangeHorizontalAnchor(shared_from_this(), -0.5f, 0.5f, 0.4f, Common::Easing::BackOut),
-		Shared::ActionHelpers::Execute(finishCallback)
+	runAction(Actions::Collection::MakeSequence(
+		Actions::Collection::Wait(0.1f * mOrder),
+		Actions::Collection::ChangeHorizontalAnchor(shared_from_this(), -0.5f, 0.5f, 0.4f, Easing::BackOut),
+		Actions::Collection::Execute(finishCallback)
 	));
 }

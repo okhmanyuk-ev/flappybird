@@ -17,7 +17,7 @@ namespace FlappyBird
 		
 	private:
 		void initialize();
-		void frame() override;
+		void onFrame() override;
 		void tap();
 		void jump();
 		void collide();
@@ -93,9 +93,9 @@ namespace FlappyBird
 		std::shared_ptr<Button> mMainMenuButton;
 
 	private: // scene
-		std::shared_ptr<Scene::Actionable<Scene::Sprite>> mBackground;
+		std::shared_ptr<Scene::Sprite> mBackground;
 		std::shared_ptr<Scene::Node> mPipeHolder = std::make_shared<Scene::Node>();
-		std::shared_ptr<Scene::Actionable<Scene::Sprite>> mGround;
+		std::shared_ptr<Scene::Sprite> mGround;
 		std::shared_ptr<Scene::Sprite> mBirdSprite = std::make_shared<Scene::Sprite>();
 		std::shared_ptr<Scene::Sprite> mGlassesSprite = std::make_shared<Scene::Sprite>();
 	};

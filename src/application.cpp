@@ -14,16 +14,6 @@ Application::Application() : Shared::Application(PROJECT_NAME, { Shared::Applica
 	PRECACHE_FONT_ALIAS("fonts/04b19.ttf", "label");
 	PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
 
-#if defined(BUILD_DEVELOPER)
-	CONSOLE->execute("hud_show_fps 1");
-	CONSOLE->execute("hud_show_drawcalls 1");
-#else
-	CONSOLE_DEVICE->setEnabled(false);
-	STATS->setEnabled(false);
-#endif
-
-	RENDERER->setVsync(true);
-
 	CACHE->makeAtlases();
 
 	initialize();
@@ -64,8 +54,8 @@ void Application::initialize()
 
 	mQuitButton->setClickCallback([this] {
 		hideMainMenu([this] {
-			Common::Actions::Run(Shared::ActionHelpers::Delayed(0.5f,
-				Shared::ActionHelpers::Execute([this] {
+			Actions::Run(Actions::Collection::Delayed(0.5f,
+				Actions::Collection::Execute([this] {
 					PLATFORM->quit();
 				})
 			));
@@ -87,8 +77,8 @@ void Application::initialize()
 		mState = State::Ready;
 	});
 
-	Common::Actions::Run(Shared::ActionHelpers::Delayed(0.75f,
-		Shared::ActionHelpers::Execute([this] {
+	Actions::Run(Actions::Collection::Delayed(0.75f,
+		Actions::Collection::Execute([this] {
 			showMainMenu();
 		})
 	));
@@ -96,7 +86,7 @@ void Application::initialize()
 	mBird.vert_position = -BirdSize.y;
 	mBird.fall_velocity = MaxFallSpeed;
 
-	mPipeHolder->setStretch({ 1.0f, 1.0f });
+	mPipeHolder->setStretch(1.0f);
 	
 	mBirdSprite->setTexture(TEXTURE("textures/bird.png"));
 	mBirdSprite->setSize(BirdSize);
@@ -116,7 +106,7 @@ void Application::initialize()
 	mGameOverScoreLabel->setVerticalAnchor(0.325f);
 	mGameOverScoreLabel->setColor(Graphics::Color::ToNormalized(253, 232, 0));
 
-	auto root = mScene->getRoot();
+	auto root = getScene()->getRoot();
 
 	auto bloom_layer = std::make_shared<Scene::BloomLayer>();
 	bloom_layer->setStretch(1.0f);
@@ -132,27 +122,27 @@ void Application::initialize()
 	sky->setStretch(1.0f);
 	bloom_layer->attach(sky);
 
-	mBackground = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+	mBackground = std::make_shared<Scene::Sprite>();
 	mBackground->setTexture(TEXTURE("textures/background.png"));
 	mBackground->setAnchor({ 0.0f, 1.0f });
 	mBackground->setPivot({ 0.0f, 1.0f });
-	mBackground->setStretch({ 4.0f, -1.0f });
+	mBackground->setStretch({ 4.0f, 0.0f });
 	mBackground->setTextureAddress(Renderer::TextureAddress::Wrap);
-	mBackground->runAction(Shared::ActionHelpers::ExecuteInfinite([this] {
-		mBackground->setTexRegion({ { 0.0f, 0.0f }, { mBackground->getWidth(), 0.0f } });
+	mBackground->runAction(Actions::Collection::ExecuteInfinite([this] {
+		mBackground->setTexRegion({ { 0.0f, 0.0f }, { mBackground->getAbsoluteWidth(), 0.0f } });
 	}));
 	sky->attach(mBackground);
 
 	sky->attach(mPipeHolder);
 
-	mGround = std::make_shared<Scene::Actionable<Scene::Sprite>>();
+	mGround = std::make_shared<Scene::Sprite>();
 	mGround->setTexture(TEXTURE("textures/ground.png"));
 	mGround->setAnchor({ 0.0f, 1.0f });
 	mGround->setPivot({ 0.0f, 1.0f });
-	mGround->setStretch({ 2.0f, -1.0f });
+	mGround->setStretch({ 2.0f, 0.0f });
 	mGround->setTextureAddress(Renderer::TextureAddress::Wrap);
-	mGround->runAction(Shared::ActionHelpers::ExecuteInfinite([this] {
-		mGround->setTexRegion({ { 0.0f, 0.0f }, { mGround->getWidth(), 0.0f } });
+	mGround->runAction(Actions::Collection::ExecuteInfinite([this] {
+		mGround->setTexRegion({ { 0.0f, 0.0f }, { mGround->getAbsoluteWidth(), 0.0f } });
 	}));
 	sky->attach(mGround);
 
@@ -171,17 +161,9 @@ void Application::initialize()
 
 	sky->attach(mRetryButton);
 	sky->attach(mMainMenuButton);
-
-#if defined(BUILD_SPY)
-	auto black_rect = std::make_shared<Scene::Rectangle>();
-	black_rect->setStretch(true);
-	black_rect->setColor(Graphics::Color::Black);
-	black_rect->setAlpha(0.8f);
-	root->attach(black_rect);
-#endif
 }
 
-void Application::frame()
+void Application::onFrame()
 {
 	float dTime = Clock::ToSeconds(FRAME->getTimeDelta());
 
@@ -353,7 +335,7 @@ void Application::frame()
 			
 			mScore += 1;
 			mScoreLabel->setText(std::to_string(mScore));
-			mScoreLabel->runAction(Shared::ActionHelpers::Shake(mScoreLabel, 3.0f, 0.2f));
+			mScoreLabel->runAction(Actions::Collection::Shake(mScoreLabel, 3.0f, 0.2f));
 			pipe->setScored(true);
 		}
 	}
@@ -451,7 +433,7 @@ void Application::showGameOverMenu()
 		mGlassesInterpolator.setDuration(Clock::FromSeconds(0.75f));
 		mGlassesInterpolator.setStartValue(mGlassesInterpolator.getValue());
 		mGlassesInterpolator.setDestinationValue(1.0f);
-		mGlassesInterpolator.setEasingFunction(Common::Easing::CubicOut);
+		mGlassesInterpolator.setEasingFunction(Easing::CubicOut);
 		mGlassesInterpolator.setPassed(Clock::Duration::zero());
 	}
 }
@@ -469,7 +451,7 @@ void Application::hideGameOverMenu(std::function<void()> finishCallback)
 		mGlassesInterpolator.setDuration(Clock::FromSeconds(0.75f));
 		mGlassesInterpolator.setStartValue(mGlassesInterpolator.getValue());
 		mGlassesInterpolator.setDestinationValue(0.0f);
-		mGlassesInterpolator.setEasingFunction(Common::Easing::CubicIn);
+		mGlassesInterpolator.setEasingFunction(Easing::CubicIn);
 		mGlassesInterpolator.setPassed(Clock::Duration::zero());
 	}
 }
