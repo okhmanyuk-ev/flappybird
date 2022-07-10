@@ -23,7 +23,6 @@ namespace FlappyBird
 		std::shared_ptr<Scene::Rectangle> mOrangeRectangle = std::make_shared<Scene::Rectangle>();
 		std::shared_ptr<Scene::Rectangle> mGreenRectangle = std::make_shared<Scene::Rectangle>();
 		std::shared_ptr<Scene::Label> mLabel = std::make_shared<Scene::Label>();
-		
 		int mOrder;
 	};
 }

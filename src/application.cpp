@@ -5,11 +5,7 @@ using namespace FlappyBird;
 Application::Application() : Shared::Application(PROJECT_NAME, { Shared::Application::Flag::Scene })
 {
 	PLATFORM->setTitle(PRODUCT_NAME);
-	PLATFORM->resize(360, 640);
-	RENDERER->setVsync(true);
-#if !defined(PLATFORM_MOBILE)
-	PLATFORM->rescale(1.5f);
-#endif
+	PLATFORM->resize(540, 960);
 
 	PRECACHE_FONT_ALIAS("fonts/04b19.ttf", "label");
 	PRECACHE_FONT_ALIAS("fonts/FFFFORWA.TTF", "button");
@@ -21,11 +17,12 @@ Application::Application() : Shared::Application(PROJECT_NAME, { Shared::Applica
 
 Application::~Application()
 {
-	//
 }
 
 void Application::initialize()
-{	
+{
+	getScene()->setScreenAdaption(glm::vec2{ 360.0f, 640.0f });
+
 	// labels
 	mFlappyBirdLabel = std::make_shared<Label>("Flappy Bird");
 	mReadyLabel = std::make_shared<Label>("Ready!?");
@@ -87,7 +84,7 @@ void Application::initialize()
 	mBird.fall_velocity = MaxFallSpeed;
 
 	mPipeHolder->setStretch(1.0f);
-	
+
 	mBirdSprite->setTexture(TEXTURE("textures/bird.png"));
 	mBirdSprite->setSize(BirdSize);
 	mBirdSprite->setPivot({ 0.5f, 0.5f });
@@ -108,26 +105,23 @@ void Application::initialize()
 
 	auto root = getScene()->getRoot();
 
-	auto bloom_layer = std::make_shared<Scene::BloomLayer>();
-	bloom_layer->setStretch(1.0f);
-	bloom_layer->setBrightThreshold(0.96f);
-	bloom_layer->setGlowIntensity(1.125f);
-	root->attach(bloom_layer);
-
 	auto sky = std::make_shared<Scene::Tappable<Scene::Rectangle>>();
 	sky->setTapCallback([this] {
 		tap();
 	});
 	sky->setColor(Graphics::Color::ToNormalized(83, 190, 206));
 	sky->setStretch(1.0f);
-	bloom_layer->attach(sky);
+	sky->runAction(Actions::Collection::ExecuteInfinite([this](Clock::Duration delta) {
+		update(Clock::ToSeconds(delta));
+	}));
+	root->attach(sky);
 
 	mBackground = std::make_shared<Scene::Sprite>();
 	mBackground->setTexture(TEXTURE("textures/background.png"));
 	mBackground->setAnchor({ 0.0f, 1.0f });
 	mBackground->setPivot({ 0.0f, 1.0f });
-	mBackground->setStretch({ 4.0f, 0.0f });
-	mBackground->setTextureAddress(Renderer::TextureAddress::Wrap);
+	mBackground->setStretch({ 2.0f, 0.0f });
+	mBackground->setTextureAddress(skygfx::TextureAddress::Wrap);
 	mBackground->runAction(Actions::Collection::ExecuteInfinite([this] {
 		mBackground->setTexRegion({ { 0.0f, 0.0f }, { mBackground->getAbsoluteWidth(), 0.0f } });
 	}));
@@ -140,7 +134,7 @@ void Application::initialize()
 	mGround->setAnchor({ 0.0f, 1.0f });
 	mGround->setPivot({ 0.0f, 1.0f });
 	mGround->setStretch({ 2.0f, 0.0f });
-	mGround->setTextureAddress(Renderer::TextureAddress::Wrap);
+	mGround->setTextureAddress(skygfx::TextureAddress::Wrap);
 	mGround->runAction(Actions::Collection::ExecuteInfinite([this] {
 		mGround->setTexRegion({ { 0.0f, 0.0f }, { mGround->getAbsoluteWidth(), 0.0f } });
 	}));
@@ -163,10 +157,8 @@ void Application::initialize()
 	sky->attach(mMainMenuButton);
 }
 
-void Application::onFrame()
+void Application::update(float dTime)
 {
-	float dTime = Clock::ToSeconds(FRAME->getTimeDelta());
-
 	if ((mState != State::GameOver && mState != State::None) || mClearing)
 	{
 		if (mState == State::Quit)
@@ -219,12 +211,12 @@ void Application::onFrame()
 	{
 		mWorld.horz_velocity *= 3.25f;
 	}
-	
+
 	if (mClearing)
 	{
 		mWorld.horz_velocity *= 12.5f * mPipeHolder->getNodes().size();
 	}
-	
+
 	if (mClearing || mState == State::Main || mState == State::Ready)
 	{
 		if (mBird.vert_position >= PLATFORM->getLogicalHeight() / 2.0f)
@@ -234,7 +226,7 @@ void Application::onFrame()
 	}
 
 	float offset = 0.0f;
-	
+
 	if (mState != State::GameOver || mClearing)
 		offset = mWorld.horz_velocity * dTime * 100.0f / 1.5f;
 
@@ -242,7 +234,7 @@ void Application::onFrame()
 
 	mBackground->setY(-mGround->getHeight());
 	mBackground->setX(mBackground->getX() - (offset / 2.0f));
-	if (auto tex_w = mBackground->getTexture()->getWidth(); mBackground->getX() <= -tex_w)
+	if (auto tex_w = (float)mBackground->getTexture()->getWidth(); mBackground->getX() <= -tex_w)
 	{
 		mBackground->setX(mBackground->getX() + tex_w);
 	}
@@ -263,7 +255,7 @@ void Application::onFrame()
 	while (mPipeHolder->hasNodes())
 	{
 		auto node = mPipeHolder->getNodes().front();
-		
+
 		if (node->getX() > -node->getWidth() / 2.0f)
 			break;
 
@@ -296,10 +288,10 @@ void Application::onFrame()
 	{
 		if (mBird.vert_position + (BirdSize.y / 2.0f) >= getWorkingAreaHeight())
 			collide();
-		
+
 		if (mBird.vert_position - (BirdSize.y / 2.0f) <= 0.0f)
 			collide();
-		
+
 		for (auto& pipe : mPipeHolder->getNodes())
 		{
 			if (getBirdHorizontalPosition() + (BirdSize.x / 2.0f) < pipe->getX() - (pipe->getWidth() / 2.0f) ||
@@ -326,15 +318,15 @@ void Application::onFrame()
 		for (const auto _pipe : mPipeHolder->getNodes())
 		{
 			auto pipe = std::static_pointer_cast<Pipe>(_pipe);
-			
+
 			if (pipe->isScored())
 				continue;
 
 			if (pipe->getX() + (pipe->getWidth() / 2.0f) >= getBirdHorizontalPosition() - (BirdSize.x / 2.0f))
 				continue;
-			
+
 			mScore += 1;
-			mScoreLabel->setText(std::to_string(mScore));
+			mScoreLabel->setText(std::to_wstring(mScore));
 			mScoreLabel->runAction(Actions::Collection::Shake(mScoreLabel, 3.0f, 0.2f));
 			pipe->setScored(true);
 		}
@@ -356,6 +348,14 @@ void Application::onFrame()
 	mGlassesSprite->setY(glassesDefaultPos + ((-glassesDefaultPos + mBird.vert_position - 5.0f) * mGlassesInterpolator.getValue()));
 }
 
+void Application::onEvent(const Platform::Input::Keyboard::Event& e)
+{
+	if (e.type == Platform::Input::Keyboard::Event::Type::Pressed)
+	{
+		tap();
+	}
+}
+
 void Application::tap()
 {
 	if (CONSOLE_DEVICE->isOpened())
@@ -369,12 +369,12 @@ void Application::tap()
 		mState = State::Playing;
 		hideReadyMenu(std::bind(&Application::showPlayMenu, this));
 		mScore = 0;
-		mScoreLabel->setText(std::to_string(mScore));
+		mScoreLabel->setText(std::to_wstring(mScore));
 	}
-	
+
 	if (mState != State::Playing)
 		return;
-	
+
 	jump();
 }
 
@@ -421,7 +421,7 @@ void Application::hideReadyMenu(std::function<void()> finishCallback)
 
 void Application::showGameOverMenu()
 {
-	mGameOverScoreLabel->setText("Score: " + std::to_string(mScore));
+	mGameOverScoreLabel->setText(L"Score: " + std::to_wstring(mScore));
 	mGameOverLabel->show();
 	mGameOverScoreLabel->show(nullptr, 1.0f, 0.175f);
 	mRetryButton->show();

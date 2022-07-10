@@ -8,16 +8,17 @@
 
 namespace FlappyBird
 {
-	class Application : public Shared::Application, 
-		public Common::FrameSystem::Frameable
+	class Application : public Shared::Application,
+		public Common::Event::Listenable<Platform::Input::Keyboard::Event>
 	{
 	public:
 		Application();
 		~Application();
-		
+
 	private:
 		void initialize();
-		void onFrame() override;
+		void update(float dTime);
+		void onEvent(const Platform::Input::Keyboard::Event& e) override;
 		void tap();
 		void jump();
 		void collide();

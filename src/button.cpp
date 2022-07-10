@@ -32,14 +32,14 @@ Button::Button(const std::string& text, int order) : mOrder(order)
 	mGreenRectangle->setSize(size - glm::vec2(8.0f));
 	mGreenRectangle->setColor(Graphics::Color::ToNormalized(97, 231, 0));
 	mGreenRectangle->setEnabled(false);
-	
+
 	mLabel->setFont(FONT("button"));
 	mLabel->setFontSize(20.0f);
-	mLabel->setText(text);
+	mLabel->setText(sky::to_wstring(text));
 	mLabel->setPivot({ 0.5f, 0.5f });
 	mLabel->setAnchor({ 0.5f, 0.5f });
 	mLabel->setColor(Graphics::Color::White);
-	mLabel->setOutlineColor(Graphics::Color::White);
+	mLabel->getOutlineColor()->setColor(Graphics::Color::White);
 	mLabel->setOutlineThickness(0.2f); // fix FFFFORWA artefacts, wtf
 
 	attach(mBlackRectangle);
@@ -60,7 +60,6 @@ Button::Button(const std::string& text, int order) : mOrder(order)
 
 Button::~Button()
 {
-	//
 }
 
 void Button::hide(std::function<void()> finishCallback)

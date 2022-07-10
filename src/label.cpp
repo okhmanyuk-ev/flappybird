@@ -6,16 +6,15 @@ Label::Label(const std::string& text)
 {
 	setFont(FONT("label"));
 	setFontSize(50.0f);
-	setText(text);
+	setText(sky::to_wstring(text));
 	setPivot({ 0.5f, 0.5f });
 	setAnchor({ -0.5f, 0.25f });
-	setOutlineColor(Graphics::Color::Black);
+	getOutlineColor()->setColor(Graphics::Color::Black);
 	setOutlineThickness(0.75f);
 }
 
 Label::~Label()
 {
-	//
 }
 
 void Label::hide(std::function<void()> finishCallback, float speed, float delay)
